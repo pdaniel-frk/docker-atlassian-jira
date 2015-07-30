@@ -10,7 +10,8 @@ REGEX_STARTUP = /Server startup in \d+ ms/
 REGEX_FILTER  =
 [
   # when `dbconfig.xml` does not exists when starting up instance
-  /no\ defaultDS\ datasource/
+  /no\ defaultDS\ datasource/,
+  %r{\[atlassian\.jira\.tenancy\.PluginKeyPredicateLoader\]\ Could\ not\ read\ tenant\-smart\ pattern\ file\ '/usr/local/atlassian/jira/atlassian\-jira/WEB\-INF/classes/tenant\-smart\-patterns\.txt}
 ].inject { |*args| Regexp.union(*args) }
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |file| require file }
