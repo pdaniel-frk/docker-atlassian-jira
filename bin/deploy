@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# Obtain the latest Atlassian JIRA version by going to the JSON version feed
+# information to get a JSONP formatted response, strip the output to retrieve
+# the actual content and then get the version number from the first entry.
+VERSION=$(curl -Ls 'https://my.atlassian.com/download/feeds/current/jira.json' | sed 's/downloads(\(.*\))/\1/g' | jq -r '.[0].version')
+
+git fetch --all
+git show-branch "origin/${VERSION}"
+
+# Checkout a new branch with no starting point
+
+if [[ $? == 0 ]]; then
+
+	echo "Branch '${VERSION}' already exist. Skipping..."
+
+else
+
+	echo "Creating new branch ${VERSION}"
+
+	git checkout --orphan "${VERSION}"
+	git config --global user.email "circleci@circleci"
+	git config --global user.name "Circle CI Automated Builder"
+
+	echo "Committing changes"
+
+	git add --all
+	git commit --message "Created new Atlassian JIRA branch for version ${VERSION}"
+
+	echo "Pushing new branch ${VERSION}"
+
+	git push origin "${VERSION}" || exit 255
+
+	echo "Deployed new version to new branch ${VERSION}"
+
+fi
